@@ -7,6 +7,9 @@ tableroDificil = tablerosJuego.tableroDificil
 
 opciones = ["Nivel Facil","Nivel Medio","Nivel Dificil"]
 
+def resolverJuego():
+        print("Resolviendo...")
+
 def initGame():
     root = tk.Tk()
     root.title("Shikaku Puzzle")
@@ -80,6 +83,3 @@ def crearTablero(tablero, dimensionTablero, tamRecuadros):
     root.mainloop()
 
 initGame()
-
-def resolverJuego():
-    pendiente = 'Pendiente'
