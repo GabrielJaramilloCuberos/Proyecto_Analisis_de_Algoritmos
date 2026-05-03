@@ -10,20 +10,7 @@ opciones = ["Nivel Facil","Nivel Medio","Nivel Dificil"]
 def resolverJuego():
         print("Resolviendo...")
 
-def initGame():
-    root = tk.Tk()
-    root.title("Shikaku Puzzle")
-    root.geometry("200x200")
-
-
-
-    value_inside = tk.StringVar(root)
-    value_inside.set("Escoge un tablero")
-
-    menuOpciones = tk.OptionMenu(root,value_inside, *opciones)
-    menuOpciones.pack()
-
-    def getOpcion():
+def getOpcion(value_inside,root):
         eleccion = value_inside.get()
         if eleccion == 'Nivel Facil':
             root.destroy()
@@ -36,13 +23,31 @@ def initGame():
             root.destroy()
             crearTablero(tableroDificil,"1500x1500",60)
 
-    enviarOpcion = tk.Button(root, text='Aceptar', command=getOpcion)
+
+def opcionVolver(root):
+    root.destroy()
+    initGame()
+
+def initGame():
+    root = tk.Tk()
+    root.title("Shikaku Puzzle")
+    root.geometry("200x200")
+
+    value_inside = tk.StringVar(root)
+    value_inside.set("Escoge un tablero")
+
+    menuOpciones = tk.OptionMenu(root,value_inside, *opciones)
+    menuOpciones.pack()
+
+    enviarOpcion = tk.Button(root, text='Aceptar', command=lambda: getOpcion(value_inside, root))
     enviarOpcion.pack()
 
     root.mainloop()
 
 def crearTablero(tablero, dimensionTablero, tamRecuadros):
+
     tamanio = tamRecuadros
+
     root = tk.Tk()
     root.title("Shikaku Puzzle")
     root.geometry(dimensionTablero)
@@ -69,12 +74,8 @@ def crearTablero(tablero, dimensionTablero, tamRecuadros):
 
             if tablero[i][j] != 0:
                 canvas.create_text((x1+x2)/2, (y1+y2)/2, text=tablero[i][j], font=("Arial", 20), fill='black')
-
-    def opcionVolver():
-        root.destroy()
-        initGame()
     
-    volver = tk.Button(root, text='Volver', command=opcionVolver)
+    volver = tk.Button(root, text='Volver', command=lambda: opcionVolver(root))
     volver.pack()
 
     resolver = tk.Button(root, text='Resolver juego', command=resolverJuego)
