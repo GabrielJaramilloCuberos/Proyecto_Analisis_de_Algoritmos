@@ -7,8 +7,21 @@ tableroMedio = tablerosJuego.tableroMedio
 tableroDificil = tablerosJuego.tableroDificil
 
 opciones = ["Nivel Facil","Nivel Medio","Nivel Dificil"]
+colores = [
+    "red", "blue", "green", "yellow", "purple",
+    "orange", "pink", "cyan", "magenta", "lime",
+    "teal", "lavender", "brown", "beige", "maroon",
+    "mint cream", "navy", "aquamarine", "turquoise", "gold",
+    "coral", "salmon", "khaki", "plum", "orchid",
+    "crimson", "indigo", "violet", "tan", "sky blue",
+    "light green", "light blue", "light coral", "light pink",
+    "dark green", "dark blue", "dark red", "dark orange",
+    "deep pink", "dodger blue", "forest green", "hot pink",
+    "medium purple", "royal blue", "spring green"
+]
 rect_preview = None
 color_actual = None
+posibleSeleccion = None
 selecciones = []
 
 def resolverJuego():
@@ -27,9 +40,9 @@ def getOpcion(value_inside,root):
             root.destroy()
             crearTablero(tableroDificil,"1500x1500",60)
 
-
 def opcionVolver(root):
     root.destroy()
+    selecciones.clear()
     initGame()
 
 def clickInicial(event,tamanio):
@@ -38,13 +51,15 @@ def clickInicial(event,tamanio):
     columna = event.x // tamanio
     inicio = (fila,columna)
 
-    color_actual = random.choice(["red", "blue", "green", "yellow", "purple"])
+    color_actual = random.choice(colores)
 
     print(inicio)
 
 def seleccionarRecuadros(event, tamanio, canvas):
 
-    global rect_preview
+    global rect_preview, posibleSeleccion
+
+    posibleSeleccion = True
 
     fila1, columna1 = inicio
     x1 = columna1 * tamanio
@@ -58,7 +73,9 @@ def seleccionarRecuadros(event, tamanio, canvas):
 
     rect_preview = canvas.create_rectangle((x1,y1,x2,y2),fill=color_actual, stipple = 'gray50', width = 2)
 
+
 def cuadroFinal(event,canvas):
+
     global inicio, rect_preview, rectangulos, color_actual
 
     if inicio is None or rect_preview is None:
@@ -74,12 +91,15 @@ def cuadroFinal(event,canvas):
     )
 
     selecciones.append(rect)
+    for i in range(len(selecciones)):
+        print(canvas.coords(selecciones[i]))
 
     canvas.delete(rect_preview)
     rect_preview = None
     inicio = None
 
 def initGame():
+
     root = tk.Tk()
     root.title("Shikaku Puzzle")
     root.geometry("200x200")
