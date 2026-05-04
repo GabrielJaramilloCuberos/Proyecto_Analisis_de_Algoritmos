@@ -52,7 +52,6 @@ def clickInicial(event,tamanio):
     fila = event.y // tamanio
     columna = event.x // tamanio
     inicio = (fila,columna)
-|   
     #Nota que cuando se elige uno de los aleatorios, puede caer en repeticiones
     #Como ya tienes muchas opciones simplemente crea un iterador global para el arreglo de los colores
     # https://en.wikipedia.org/wiki/KISS_principle
@@ -83,7 +82,7 @@ def cuadroFinal(event,canvas):
 
     global inicio, rect_preview, rectangulos, color_actual
 
-    if inicio is None or rect_pre    #TODO view is None:
+    if inicio is None or rect_pre: 
         return
 
     coords = canvas.coords(rect_preview)
