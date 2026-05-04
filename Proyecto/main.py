@@ -25,8 +25,10 @@ posibleSeleccion = None
 selecciones = []
 
 def resolverJuego():
+        #TODO
         print("Resolviendo...")
 
+# Definir tipo de tablero
 def getOpcion(value_inside,root):
         eleccion = value_inside.get()
         if eleccion == 'Nivel Facil':
@@ -50,7 +52,10 @@ def clickInicial(event,tamanio):
     fila = event.y // tamanio
     columna = event.x // tamanio
     inicio = (fila,columna)
-
+|   
+    #Nota que cuando se elige uno de los aleatorios, puede caer en repeticiones
+    #Como ya tienes muchas opciones simplemente crea un iterador global para el arreglo de los colores
+    # https://en.wikipedia.org/wiki/KISS_principle
     color_actual = random.choice(colores)
 
     print(inicio)
@@ -78,7 +83,7 @@ def cuadroFinal(event,canvas):
 
     global inicio, rect_preview, rectangulos, color_actual
 
-    if inicio is None or rect_preview is None:
+    if inicio is None or rect_pre    #TODO view is None:
         return
 
     coords = canvas.coords(rect_preview)
@@ -133,7 +138,7 @@ def crearTablero(tablero, dimensionTablero, tamRecuadros):
 
     color = 'white'
 
-    for i in range(filas):
+    for i in range(filas):    #TODO
         for j in range(columnas):
 
             x1 = j * tamanio
