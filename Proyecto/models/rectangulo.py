@@ -1,5 +1,5 @@
 class Rectangulo:
-    def __init__(self, filaInicio, filaFinal, columnaInicio, columnaFinal, idPista):
+    def __init__(self, filaInicio, filaFinal, columnaInicio, columnaFinal, idPista=None):
         self.filaInicio = filaInicio
         self.filaFinal = filaFinal
         self.columnaInicio = columnaInicio
@@ -14,7 +14,8 @@ class Rectangulo:
                 indiceBit = (r * totalColumnas) + c
                 self.mascara |= (1<< indiceBit)
 
-        bitPista = totalCeldas + self.idPista
-        self.mascara |= (1<< bitPista)
+        if self.idPista is not None:
+            bitPista = totalCeldas + self.idPista
+            self.mascara |= (1<< bitPista)
 
 
