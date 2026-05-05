@@ -1,7 +1,10 @@
+import random
+
 from Proyecto.models import tableros as repositorio_tableros
 from Proyecto.models.Shikaku import Shikaku
 from Proyecto.models.rectangulo import Rectangulo
 from Proyecto.view.shikakuView import ShikakuView
+
 
 class ShikakuController:
     def __init__(self):
@@ -13,13 +16,13 @@ class ShikakuController:
         self.colorActual = None
         self.tamanioCelda = 0
         self.dimensionVentana = "200x200"
-        self.juegoGanado = False
 
     def iniciar(self):
         self.vista.mostrarMenu(self)
         self.vista.mainloop()
 
     def iniciarJuego(self, nivelSeleccionado):
+        print(f"[DEBUG] iniciarJuego nivel={nivelSeleccionado}")
         self.nivelActual = nivelSeleccionado
         matriz = repositorio_tableros.obtenerTablero(nivelSeleccionado)
         configuracion = repositorio_tableros.obtenerConfiguracion(nivelSeleccionado)
@@ -30,9 +33,6 @@ class ShikakuController:
         self.filaInicio = None
         self.colInicio = None
         self.colorActual = None
-        self.juegoGanado = False
-        self.vista.reiniciarColoresDisponibles()
-        self.vista.title("Shikaku Puzzle")
 
         filas = len(matriz)
         columnas = len(matriz[0]) if matriz else 0
@@ -46,6 +46,7 @@ class ShikakuController:
         )
 
     def volverAlMenu(self):
+        print("[DEBUG] volverAlMenu")
         self.modelo = None
         self.nivelActual = None
         self.filaInicio = None
@@ -53,25 +54,42 @@ class ShikakuController:
         self.colorActual = None
         self.tamanioCelda = 0
         self.dimensionVentana = "200x200"
-        self.juegoGanado = False
-        self.vista.reiniciarColoresDisponibles()
-        self.vista.title("Shikaku Puzzle")
         self.vista.mostrarMenu(self)
 
     def resolverJuego(self):
+        print("[DEBUG] resolverJuego")
         print("Resolviendo...")
 
-    def actualizarTituloJuego(self):
-        if self.modelo is not None and self.modelo.tableroCompleto():
-            self.juegoGanado = True
-            self.vista.title("Gano!")
-        else:
-            self.juegoGanado = False
-            self.vista.title("Shikaku Puzzle")
+        if self.modelo is None:
+            print("[DEBUG] resolverJuego cancelado: no hay modelo")
+            return
+
+        self.modelo.rectangulos.clear()
+        self.vista.borrarRectangulo()
+        self.vista.limpiarRectangulosUsuario()
+
+        solucion = self.modelo.solucionador()
+        if solucion is None:
+            print("[DEBUG] solver sin solucion")
+            return
+
+        print(f"[DEBUG] solver encontro {len(solucion)} rectangulos")
+        for rectanguloSolucion in solucion:
+            self.modelo.crearRectangulo(rectanguloSolucion)
+
+            x1 = rectanguloSolucion.columnaInicio * self.tamanioCelda
+            y1 = rectanguloSolucion.filaInicio * self.tamanioCelda
+            x2 = (rectanguloSolucion.columnaFinal + 1) * self.tamanioCelda
+            y2 = (rectanguloSolucion.filaFinal + 1) * self.tamanioCelda
+
+            color = random.choice(self.vista.coloresDisponibles)
+            self.vista.consolidarRectangulo(x1, y1, x2, y2, color)
 
     def onClickInicial(self, event):
-        if self.tamanioCelda <= 0 or self.juegoGanado:
+        if self.tamanioCelda <= 0:
             return
+
+        print(f"[DEBUG] onClickInicial x={event.x} y={event.y}")
 
         if self.modelo is not None:
             rectanguloInfo = self.vista.obtenerRectanguloUsuarioEnPunto(event.x, event.y)
@@ -90,10 +108,11 @@ class ShikakuController:
                     colFin,
                 )
                 if eliminado:
-                    colorRectangulo = self.vista.eliminarRectanguloPorId(rectanguloId)
-                    if colorRectangulo is not None:
-                        self.vista.liberarColor(colorRectangulo)
-                    self.actualizarTituloJuego()
+                    print(
+                        f"[DEBUG] rectangulo eliminado fila={filaInicio}-{filaFin} "
+                        f"col={colInicio}-{colFin}"
+                    )
+                    self.vista.eliminarRectanguloPorId(rectanguloId)
 
                 self.filaInicio = None
                 self.colInicio = None
@@ -103,15 +122,14 @@ class ShikakuController:
 
         self.filaInicio = event.y // self.tamanioCelda
         self.colInicio = event.x // self.tamanioCelda
-        self.colorActual = self.vista.obtenerColorDisponible()
-
-        if self.colorActual is None:
-            self.filaInicio = None
-            self.colInicio = None
-            return
+        self.colorActual = random.choice(self.vista.coloresDisponibles)
+        print(
+            f"[DEBUG] seleccion inicio fila={self.filaInicio} col={self.colInicio} "
+            f"color={self.colorActual}"
+        )
 
     def onArrastrar(self, event):
-        if self.juegoGanado or self.filaInicio is None or self.colInicio is None:
+        if self.filaInicio is None or self.colInicio is None:
             return
 
         filaActual = event.y // self.tamanioCelda
@@ -130,7 +148,7 @@ class ShikakuController:
         self.vista.dibujarRecuadroTemporal(x1, y1, x2, y2, self.colorActual)
 
     def onSoltarClic(self, event):
-        if self.juegoGanado or self.filaInicio is None or self.colInicio is None:
+        if self.filaInicio is None or self.colInicio is None:
             return
 
         filaFinal = event.y // self.tamanioCelda
@@ -155,14 +173,19 @@ class ShikakuController:
                 colFin,
             )
 
+        print(
+            f"[DEBUG] intento rectangulo fila={filaInicio}-{filaFin} "
+            f"col={colInicio}-{colFin} valido={esValido}"
+        )
+
         if esValido:
             self.modelo.crearRectangulo(
                 Rectangulo(filaInicio, filaFin, colInicio, colFin)
             )
             self.vista.consolidarRectangulo(x1, y1, x2, y2, self.colorActual)
-            self.actualizarTituloJuego()
-        elif self.colorActual is not None:
-            self.vista.liberarColor(self.colorActual)
+            print(f"[DEBUG] rectangulo creado total={len(self.modelo.rectangulos)}")
+        else:
+            print("[DEBUG] rectangulo rechazado")
 
         self.vista.borrarRectangulo()
 
