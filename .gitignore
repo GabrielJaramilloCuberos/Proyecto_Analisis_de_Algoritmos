@@ -1,1 +1,5 @@
-Proyecto/
+
+__pycache__/
+*.py[cod]
+
+.vscode
